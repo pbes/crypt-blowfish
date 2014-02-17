@@ -1,0 +1,28 @@
+{
+    "authors": [
+        {
+            "email": "mfonda@php.net",
+            "name": "Matthew Fonda",
+            "role": "Lead"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "Crypt_Blowfish": "./"
+        }
+    },
+    "description": "More info available on: http://pear.php.net/package/Crypt_Blowfish",
+    "include-path": [
+        "./"
+    ],
+    "license": "PHP",
+    "name": "pear/crypt_blowfish",
+    "support": {
+        "issues": "http:///bugs/search.php?cmd=display&package_name[]=Crypt_Blowfish",
+        "source": "https://github.com/pear/Crypt_Blowfish"
+    },
+    "type": "library",
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    }
+}
