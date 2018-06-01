@@ -1,208 +1,183 @@
 <?php
 
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
 /**
+ * PHP version 7
+ *
  * Crypt_Blowfish allows for encryption and decryption on the fly using
  * the Blowfish algorithm. Crypt_Blowfish does not require the mcrypt
  * PHP extension, but uses it if available, otherwise it uses only PHP.
  * Crypt_Blowfish support encryption/decryption with or without a secret key.
- *
- * PHP versions 4 and 5
- *
- * @category   Encryption
- * @package    Crypt_Blowfish
- * @author     Matthew Fonda <mfonda@php.net>
- * @author     Philippe Jausions <jausions@php.net>
- * @copyright  2005-2008 Matthew Fonda
- * @license    http://www.opensource.net/licenses/bsd-license.php New BSD
- * @version    CVS: $Id$
- * @link       http://pear.php.net/package/Crypt_Blowfish
- * @since      1.1.0
  */
 
-/**
- * Include base class
- */
-require_once 'Crypt/Blowfish.php';
+namespace Crypt;
+
+use PEAR;
+use PEAR_Error;
 
 /**
- * Common class for PHP-only implementations
- *
- * @category   Encryption
- * @package    Crypt_Blowfish
- * @author     Matthew Fonda <mfonda@php.net>
- * @author     Philippe Jausions <jausions@php.net>
- * @copyright  2005-2008 Matthew Fonda
- * @license    http://www.opensource.net/licenses/bsd-license.php New BSD
- * @link       http://pear.php.net/package/Crypt_Blowfish
- * @version    @package_version@
- * @since      1.1.0
+ * @author    Matthew Fonda <mfonda@php.net>
+ * @author    Philippe Jausions <jausions@php.net>
+ * @copyright 2005-2008 Matthew Fonda
+ * @license   http://www.opensource.net/licenses/bsd-license.php New BSD
+ * @link      http://pear.php.net/package/Crypt_Blowfish
  */
-class Crypt_Blowfish_PHP extends Crypt_Blowfish
+class Php extends Blowfish
 {
     /**
-     * P-Array contains 18 32-bit subkeys
+     * P-Array contains 18 32-bit subkeys.
      *
      * @var array
-     * @access protected
      */
-    var $_P = array();
+    protected $_P = [];
 
     /**
-     * Array of four S-Blocks each containing 256 32-bit entries
+     * Array of four S-Blocks each containing 256 32-bit entries.
      *
      * @var array
-     * @access protected
      */
-    var $_S = array();
+    protected $_S = [];
 
     /**
-     * Whether the IV is required
+     * Whether the IV is required.
      *
-     * @var boolean
-     * @access protected
+     * @var bool
      */
-    var $_iv_required = false;
-    
-    /**
-     * Hash value of last used key
-     * 
-     * @var     string
-     * @access  protected
-     */
-    var $_keyHash = null;
+    protected $_iv_required = false;
 
     /**
-     * Crypt_Blowfish_PHP Constructor
-     * Initializes the Crypt_Blowfish object, and sets
-     * the secret key
+     * Hash value of last used key.
      *
-     * @param string $key
-     * @param string $mode operating mode 'ecb' or 'cbc'
-     * @param string $iv initialization vector
-     * @access protected
+     * @var string
      */
-    function __construct($key = null, $iv = null)
+    protected $_keyHash = null;
+
+    /**
+     * @return void
+     */
+    protected function _init()
     {
-        $this->_iv = $iv . ((strlen($iv) < $this->_iv_size)
-                            ? str_repeat(chr(0), $this->_iv_size - strlen($iv))
-                            : '');
-        if (!is_null($key)) {
-            $this->setKey($key, $this->_iv);
-        }
-    }
-
-    /**
-     * Initializes the Crypt_Blowfish object
-     *
-     * @access private
-     */
-    function _init()
-    {
-        require_once 'Crypt/Blowfish/DefaultKey.php';
-        $defaults = new Crypt_Blowfish_DefaultKey();
+        $defaults = new Key();
         $this->_P = $defaults->P;
         $this->_S = $defaults->S;
     }
 
     /**
-     * Workaround for XOR on certain systems
+     * Workaround for XOR on certain systems.
      *
-     * @param integer|float $l
-     * @param integer|float $r
+     * @param  int|float $l
+     * @param  int|float $r
      * @return float
-     * @access protected
      */
-    function _binxor($l, $r)
+    protected function _binxor($l, $r)
     {
-        $x = (($l < 0) ? (float)($l + 4294967296) : (float)$l)
-             ^ (($r < 0) ? (float)($r + 4294967296) : (float)$r);
+        $x = (($l < 0) ? (float) ($l + 4294967296) : (float) $l) ^ (($r < 0) ? (float) ($r + 4294967296) : (float) $r);
 
-        return (float)(($x < 0) ? $x + 4294967296 : $x);
+        return (float) (($x < 0) ? $x + 4294967296 : $x);
     }
 
     /**
-     * Enciphers a single 64-bit block
+     * Enciphers a single 64-bit block.
      *
-     * @param int &$Xl
-     * @param int &$Xr
-     * @access protected
+     * @param  int &$Xl
+     * @param  int &$Xr
+     * @return void
      */
-    function _encipher(&$Xl, &$Xr)
+    protected function _encipher(int &$Xl, int &$Xr)
     {
         if ($Xl < 0) {
             $Xl += 4294967296;
         }
+
         if ($Xr < 0) {
             $Xr += 4294967296;
         }
 
         for ($i = 0; $i < 16; $i++) {
             $temp = $Xl ^ $this->_P[$i];
+
             if ($temp < 0) {
                 $temp += 4294967296;
             }
 
             $Xl = fmod((fmod($this->_S[0][($temp >> 24) & 255]
-                             + $this->_S[1][($temp >> 16) & 255], 4294967296) 
-                        ^ $this->_S[2][($temp >> 8) & 255]) 
-                       + $this->_S[3][$temp & 255], 4294967296) ^ $Xr;
+                      + $this->_S[1][($temp >> 16) & 255], 4294967296)
+                      ^ $this->_S[2][($temp >> 8) & 255])
+                      + $this->_S[3][$temp & 255], 4294967296) ^ $Xr;
             $Xr = $temp;
         }
+
         $Xr = $this->_binxor($Xl, $this->_P[16]);
         $Xl = $this->_binxor($temp, $this->_P[17]);
     }
 
     /**
-     * Deciphers a single 64-bit block
+     * Deciphers a single 64-bit block.
      *
      * @param int &$Xl
      * @param int &$Xr
-     * @access protected
      */
-    function _decipher(&$Xl, &$Xr)
+    protected function _decipher(int &$Xl, int &$Xr)
     {
         if ($Xl < 0) {
             $Xl += 4294967296;
         }
+
         if ($Xr < 0) {
             $Xr += 4294967296;
         }
 
         for ($i = 17; $i > 1; $i--) {
             $temp = $Xl ^ $this->_P[$i];
+
             if ($temp < 0) {
                 $temp += 4294967296;
             }
 
             $Xl = fmod((fmod($this->_S[0][($temp >> 24) & 255]
-                             + $this->_S[1][($temp >> 16) & 255], 4294967296) 
-                        ^ $this->_S[2][($temp >> 8) & 255]) 
-                       + $this->_S[3][$temp & 255], 4294967296) ^ $Xr;
+                      + $this->_S[1][($temp >> 16) & 255], 4294967296)
+                      ^ $this->_S[2][($temp >> 8) & 255])
+                      + $this->_S[3][$temp & 255], 4294967296) ^ $Xr;
             $Xr = $temp;
         }
+
         $Xr = $this->_binxor($Xl, $this->_P[1]);
         $Xl = $this->_binxor($temp, $this->_P[0]);
     }
 
     /**
-     * Sets the secret key
+     * Crypt_Blowfish_PHP Constructor.
+     *
+     * Initializes the Crypt_Blowfish object, and sets
+     * the secret key.
+     *
+     * @param string|null $key
+     * @param string|null $iv
+     */
+    public function __construct(string $key = null, string $iv = null)
+    {
+        $this->_iv = $iv . ((strlen($iv) < $this->_iv_size) ? str_repeat(chr(0), $this->_iv_size - strlen($iv)) : '');
+
+        if (! is_null($key)) {
+            $this->setKey($key, $this->_iv);
+        }
+    }
+
+    /**
+     * Sets the secret key.
+     *
      * The key must be non-zero, and less than or equal to
      * 56 characters (bytes) in length.
      *
      * If you are making use of the PHP mcrypt extension, you must call this
      * method before each encrypt() and decrypt() call.
      *
-     * @param string $key
-     * @param string $iv 8-char initialization vector (required for CBC mode)
-     * @return boolean|PEAR_Error  Returns TRUE on success, PEAR_Error on failure
-     * @access public
-     * @todo Fix the caching of the key
+     * @param  string      $key
+     * @param  string|null $iv
+     * @return bool|PEAR_Error
      */
-    function setKey($key, $iv = null)
+    public function setKey(string $key, string $iv = null)
     {
-        if (!is_string($key)) {
+        if (! is_string($key)) {
             return PEAR::raiseError('Key must be a string', 2);
         }
 
@@ -216,6 +191,7 @@ class Crypt_Blowfish_PHP extends Crypt_Blowfish
             if (strlen($iv) != $this->_iv_size) {
                 return PEAR::raiseError('IV must be ' . $this->_iv_size . '-character (byte) long. Supplied IV length: ' . strlen($iv), 7);
             }
+
             $this->_iv = $iv;
         }
 
@@ -232,10 +208,12 @@ class Crypt_Blowfish_PHP extends Crypt_Blowfish
 
         for ($i = 0; $i < 18; $i++) {
             $data = 0;
+
             for ($j = 4; $j > 0; $j--) {
-                    $data = $data << 8 | ord($key{$k});
-                    $k = ($k+1) % $len;
+                $data = $data << 8 | ord($key{$k});
+                $k = ($k+1) % $len;
             }
+
             $this->_P[$i] ^= $data;
         }
 
@@ -244,21 +222,25 @@ class Crypt_Blowfish_PHP extends Crypt_Blowfish
             $this->_P[$i] = $datal;
             $this->_P[$i+1] = $datar;
         }
+
         for ($i = 0; $i < 256; $i += 2) {
             $this->_encipher($datal, $datar);
             $this->_S[0][$i] = $datal;
             $this->_S[0][$i+1] = $datar;
         }
+
         for ($i = 0; $i < 256; $i += 2) {
             $this->_encipher($datal, $datar);
             $this->_S[1][$i] = $datal;
             $this->_S[1][$i+1] = $datar;
         }
+
         for ($i = 0; $i < 256; $i += 2) {
             $this->_encipher($datal, $datar);
             $this->_S[2][$i] = $datal;
             $this->_S[2][$i+1] = $datar;
         }
+
         for ($i = 0; $i < 256; $i += 2) {
             $this->_encipher($datal, $datar);
             $this->_S[3][$i] = $datal;
@@ -266,8 +248,7 @@ class Crypt_Blowfish_PHP extends Crypt_Blowfish
         }
 
         $this->_keyHash = md5($key);
+
         return true;
     }
 }
-
-?>

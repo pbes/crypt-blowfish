@@ -1,28 +1,25 @@
 {
+    "name": "shimochi/crypt-blowfish",
+    "description": "Fork https://github.com/pear/Crypt_Blowfish",
+    "license": "BSD-2-Clause",
+    "type": "library",
     "authors": [
         {
-            "email": "mfonda@php.net",
             "name": "Matthew Fonda",
-            "role": "Lead"
+            "email": "mfonda@php.net"
+        },
+        {
+            "name": "shimochi",
+            "email": "shimo@project-com.com"
         }
     ],
+    "require": {
+        "php": ">=7.0.0",
+        "pear/pear": "^1.0.0"
+    },
     "autoload": {
-        "psr-0": {
-            "Crypt": "./"
+        "psr-4": {
+            "Crypt\\": "src/"
         }
-    },
-    "description": "More info available on: http://pear.php.net/package/Crypt_Blowfish",
-    "include-path": [
-        "./"
-    ],
-    "license": "PHP",
-    "name": "pear/crypt_blowfish",
-    "support": {
-        "issues": "http:///bugs/search.php?cmd=display&package_name[]=Crypt_Blowfish",
-        "source": "https://github.com/pear/Crypt_Blowfish"
-    },
-    "type": "library",
-    "require-dev": {
-        "phpunit/phpunit": "*"
     }
 }
