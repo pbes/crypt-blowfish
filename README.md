@@ -1,10 +1,10 @@
 # Crypt Blowfish
 
-Fork https://github.com/pear/Crypt_Blowfish
+Fork of https://github.com/pear/Crypt_Blowfish and https://github.com/shimochi/Crypt_Blowfish
 
 ### Installation
 ```
-$ composer require shimochi/crypt-blowfish
+$ composer require pbes/crypt-blowfish
 ```
 
 ### Usage
@@ -16,7 +16,7 @@ require __DIR__ . '/../vendor/autoload.php';
 $key = 'key';
 $text = 'text';
 
-$blowfish =& Crypt\Blowfish::factory('cbc', $key);
+$blowfish = \Crypt\Blowfish::factory('ecb', $key);
 $encrypt = $blowfish->encrypt($text);
 $decrypt = $blowfish->decrypt($encrypt);
 

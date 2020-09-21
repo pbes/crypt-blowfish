@@ -1,7 +1,8 @@
 {
-    "name": "shimochi/crypt-blowfish",
-    "description": "Fork https://github.com/pear/Crypt_Blowfish",
+    "name": "pbes/crypt-blowfish",
+    "description": "Fork https://github.com/shimochi/Crypt_Blowfish for supporting PHP 7.4",
     "license": "BSD-2-Clause",
+    "version": "1.0.1",
     "type": "library",
     "authors": [
         {
@@ -11,10 +12,14 @@
         {
             "name": "shimochi",
             "email": "shimo@project-com.com"
+        },
+        {
+            "name": "Peter Bessenyei",
+            "email": "pbes@freemail.hu"
         }
     ],
     "require": {
-        "php": ">=7.0.0",
+        "php": ">=7.4.0",
         "pear/pear": "^1.0.0"
     },
     "autoload": {

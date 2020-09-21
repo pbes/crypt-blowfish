@@ -17,6 +17,7 @@ use PEAR_Error;
 /**
  * @author    Matthew Fonda <mfonda@php.net>
  * @author    Philippe Jausions <jausions@php.net>
+ * @author    Peter Bessenyei <pbes@freemail.hu>
  * @copyright 2005-2008 Matthew Fonda
  * @license   http://www.opensource.net/licenses/bsd-license.php New BSD
  * @link      http://pear.php.net/package/Crypt_Blowfish
@@ -210,7 +211,7 @@ class Php extends Blowfish
             $data = 0;
 
             for ($j = 4; $j > 0; $j--) {
-                $data = $data << 8 | ord($key{$k});
+                $data = $data << 8 | ord($key[$k]);
                 $k = ($k+1) % $len;
             }
 
