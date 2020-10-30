@@ -2,7 +2,7 @@
     "name": "pbes/crypt-blowfish",
     "description": "Fork https://github.com/shimochi/Crypt_Blowfish for supporting PHP 7.4",
     "license": "BSD-2-Clause",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "type": "library",
     "authors": [
         {
